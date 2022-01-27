@@ -19,6 +19,14 @@ async function run() {
         await client.connect();
         const database = client.db("traveldestination");
         const blogs = database.collection("blogs");
+        const users = database.collection("users");
+        
+        app.get("/allblogs", async (req, res) => {
+           
+            let result = await blogs.find({}).toArray();
+            res.send(result)
+           
+        })
         
         app.get("/blogs", async (req, res) => {
             const query = { status: "approved" }
@@ -68,6 +76,74 @@ async function run() {
            
             })
 
+        app.post("/saveuser", async (req, res) => {
+
+            const result = await users.insertOne(req.body);
+            console.log(result);
+        });
+
+        app.get("/userfind/:email", async (req, res) => {
+
+            const email = req.params.email;
+            const filter = { email: email };
+            const result = await users.findOne(filter);
+            res.send(result)
+
+
+        });
+
+
+
+        app.put("/changestatus/:id", async (req, res) => {
+
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: "approved"
+                },
+            };
+            const result = await blogs.updateOne(filter, updateDoc, options);
+            if (result.matchedCount === 1) {
+                res.send("Successfully change blog status.");
+            } else {
+                res.send("blog status change not success");
+            }
+        });
+
+        app.delete("/deleteblog/:id", async (req, res) => {
+
+            const id = req.params.id
+            const query = { _id: ObjectId(id) };
+            const result = await blogs.deleteOne(query);
+            if (result.deletedCount === 1) {
+                res.send("Blog deleted successfully");
+            } else {
+                res.send("Blog not deleted");
+            }
+        });
+      app.put("/makeadmin/:email",async(req,res)=>{
+
+      const email=req.params.email;
+      const filter = { email: email };
+      const result=await users.findOne(filter);
+     if(result==null){
+        res.send(false);
+      }else{
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: {
+            role:"admin"
+          },
+         };
+        const result = await users.updateOne(filter, updateDoc, options);
+        if (result.matchedCount === 1) {
+          res.send("Admin created successfully");
+        }
+      }
+     
+     });
 
     } finally {
         
