@@ -33,7 +33,7 @@ async function run() {
             let result = await blogs.find(query).toArray();
             res.send(result)
            
-            })
+        })
 
         app.get("/blogs/:rating", async (req, res) => {
             
@@ -42,33 +42,64 @@ async function run() {
             if (ratings == 10) {
                 const query = { status: "approved" }
                 let result = await blogs.find(query).toArray();
-                res.send(result) 
+                res.send(result)
             } else {
-                const query = { ratings: ratings,status:"approved" }
+                const query = { ratings: ratings, status: "approved" }
                 let result = await blogs.find(query).toArray();
-                res.send(result) 
+                res.send(result)
             }
            
 
         })
 
 
-         app.post("/addexperience",async (req, res) => {
+        app.post("/addexperience", async (req, res) => {
        
-          const query={title:req.body.title}
-          const findblog=await blogs.findOne(query);
+            const query = { title: req.body.title }
+            const findblog = await blogs.findOne(query);
           
-          if(findblog==null){
-            const result=await blogs.insertOne(req.body);
-            res.send(result);
+            if (findblog == null) {
+                const result = await blogs.insertOne(req.body);
+                res.send(result);
              
-          }else{
-            res.send(false)
-          }
+            } else {
+                res.send(false)
+            }
            
-           });
+        });
 
-         app.get("/singleblog/:id", async (req, res) => {
+
+        app.put("/updateblog/:id", async (req, res) => {
+              
+            const myid = req.params.id
+            const filter = { _id: ObjectId(myid) };
+            const options = { upsert: true };
+            const { image, title, expense, traveler, location, category, date, description, rating } = req.body;
+            if (image == "" || title == "" || expense == "" || traveler=="" || location=="" || category== "" || date=="" || description=="" || rating=="") {
+                  res.send(false)
+            } else {
+                const updateDoc = {
+                    $set: {
+                        image: req.body.image,
+                        title: req.body.title,
+                        expense: req.body.expense,
+                        traveler: req.body.traveler,
+                        location: req.body.location,
+                        category: req.body.category,
+                        date: req.body.date,
+                        description: req.body.description,
+                        ratings: req.body.rating,
+                        status: "pending"
+                    },
+                };
+                const result = await blogs.updateOne(filter, updateDoc, options);
+                if (result.matchedCount === 1) {
+                    res.send("Blog updated successfully");
+                }
+              }
+          });
+
+       app.get("/singleblog/:id", async (req, res) => {
              let id = req.params.id;
              const query={_id:ObjectId(id)}
              let result = await blogs.findOne(query);
