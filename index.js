@@ -89,7 +89,7 @@ async function run() {
                         date: req.body.date,
                         description: req.body.description,
                         ratings: req.body.rating,
-                        status: "pending"
+                        status: "approved"
                     },
                 };
                 const result = await blogs.updateOne(filter, updateDoc, options);
