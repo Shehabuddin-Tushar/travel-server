@@ -74,8 +74,8 @@ async function run() {
             const myid = req.params.id
             const filter = { _id: ObjectId(myid) };
             const options = { upsert: true };
-            const { image, title, expense, traveler, location, category, date, description, rating } = req.body;
-            if (image == "" || title == "" || expense == "" || traveler=="" || location=="" || category== "" || date=="" || description=="" || rating=="") {
+            const { image, title, expense, traveler, location, category, date, description, ratings } = req.body;
+            if (image == "" || title == "" || expense == "" || traveler=="" || location=="" || category== "" || date=="" || description=="" || ratings=="") {
                   res.send(false)
             } else {
                 const updateDoc = {
@@ -88,7 +88,7 @@ async function run() {
                         category: req.body.category,
                         date: req.body.date,
                         description: req.body.description,
-                        ratings: req.body.rating,
+                        ratings: req.body.ratings,
                         status: "approved"
                     },
                 };
